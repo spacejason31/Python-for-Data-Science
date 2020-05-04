@@ -133,26 +133,61 @@ for numItems in (5, 10, 15, 20, 25, 30, 35, 40, 45):
     items = buildLargeMenu(numItems, 90, 250)
     testMaxVal(items, 750, False)
 
-
+# %%
+def fib(n):
+    if n == 0 or n ==1:
+        return 1
+    else:
+        return fib(n-1) + fib(n-2)
 
 # %%
-def yieldAllCombos(items):
-    """
-    Generates all combinations of N items into two bags, whereby each item is in one or zero bags.
+def fastFib(n, memo = {}):
+    if n == 0 or n == 1:
+        return 1
+    try:
+        return memo[n]
+    except KeyError:
+        result = fastFib(n-1, memo) + fastFib(n-2, memo)
+        memo[n] = result
+        return result
 
-    Yields a tuple, (bag1, bag2), where each bag is represented as a list of which item(s) are in each bag.
-    """
-    N = len(items)
-    # Enumerate the 3**N possible combinations
-    for i in range(3**N):
-        bag1 = []
-        bag2 = []
-        for j in range(N):
-            if (i // (3 ** j)) % 3 == 1:
-                bag1.append(items[j])
-            elif (i // (3 ** j)) % 3 == 2:
-                bag2.append(items[j])
-        yield (bag1, bag2)
+for i in range(121):
+    print('fib(' + str(i) + ') =', fastFib(i))
 
 # %%
-yieldAllCombos('stuff')
+def fastMaxVal(toConsider, avail, memo = {}):
+    """Assumes toConsider a list of items, avail a weight
+       Returns a tuple of the total value of a solution to the
+         0/1 knapsack problem and the items of that solution"""
+    if (len(toConsider), avail) in memo:
+        result = memo[(len(toConsider), avail)]
+    elif toConsider == 0 or avail == 0:
+        result = (0, ())
+    elif toConsider[0].getCost() > avail:
+        #Explore right branch only
+        result = fastMaxVal(toConsider[1:], avail, memo)
+    else:
+        nextItem = toConsider[0]
+        #Explore left branch
+        withVal, withToTake = fastMaxVal(toConsider[1:],
+                                     avail - nextItem.getCost())
+        withVal += nextItem.getValue()
+        #Explore right branch
+        withoutVal, withoutToTake = fastMaxVal(toConsider[1:], avail, memo)
+        #Choose better branch
+        if withVal > withoutVal:
+            result = (withVal, withToTake + (nextItem,))
+        else:
+            result = (withoutVal, withoutToTake)
+    memo[(len(toConsider), avail)] = result
+    return result
+
+def testMaxVal(foods, maxUnits, algorithm, printItems = True):
+    print('Menu contains', len(foods), 'items')
+    print('Use search tree to allocate', maxUnits,
+          'calories')
+    val, taken = algorithm(foods, maxUnits)
+    if printItems:
+        print('Total value of items taken =', val)
+        for item in taken:
+            print('   ', item)
