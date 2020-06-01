@@ -65,7 +65,6 @@ class Graph(Digraph):
         rev = Edge(edge.getDestination(), edge.getSource())
         Digraph.addEdge(self, rev)
 
-    
 def buildCityGraph(graphType):
     g = graphType()
     for name in ('Boston', 'Providence', 'New York', 'Chicago',
@@ -81,5 +80,5 @@ def buildCityGraph(graphType):
     g.addEdge(Edge(g.getNode('Denver'), g.getNode('New York')))
     g.addEdge(Edge(g.getNode('Los Angeles'), g.getNode('Boston')))
     return g
-    
+
 print(buildCityGraph(Graph))
