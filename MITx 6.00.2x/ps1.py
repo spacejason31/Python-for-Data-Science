@@ -30,6 +30,21 @@ def load_cows(filename):
         cow_dict[line_data[0]] = int(line_data[1])
     return cow_dict
 
+class Cows(object):
+    def __init__(self, n, w):
+        self.name = n
+        self.weight = w
+    def getName(self):
+        return self.name
+    def getWeight(self):
+        return self.weight
+
+def buildCows(dict):
+    cow_list = []
+    for i, j in dict.items():
+        cow_list.append(Cows(n = i, w = j))
+    return cow_list
+
 
 # Problem 1
 def greedy_cow_transport(cows,limit=10):
@@ -55,7 +70,19 @@ def greedy_cow_transport(cows,limit=10):
     trips
     """
     # TODO: Your code here
+    cow_set = buildCows(cows)
+    items_sort = sorted(cow_set, reverse = False, key = Cows.getWeight)
+    result = []
+    total_weight = 0
+    for i in range(len(items_sort)):
+        if (total_weight + items_sort[i].getWeight()) <= limit:
+            result.append(items_sort[i].getName())
+            total_weight += items_sort[i].getWeight()
+    return (result, total_weight)
     pass
+    """
+    This manipulates the original dictionary, converting it into a class of cows. I can't figure out how to run through iterations of a dictionary
+    """
 
 
 # Problem 2
@@ -80,6 +107,7 @@ def brute_force_cow_transport(cows,limit=10):
     trips
     """
     # TODO: Your code here
+
     pass
 
 
