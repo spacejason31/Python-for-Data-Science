@@ -30,7 +30,7 @@ def load_cows(filename):
         cow_dict[line_data[0]] = int(line_data[1])
     return cow_dict
 
-class Cows(object):
+class Cattle(object):
     def __init__(self, n, w):
         self.name = n
         self.weight = w
@@ -38,51 +38,96 @@ class Cows(object):
         return self.name
     def getWeight(self):
         return self.weight
+    def __str__(self):
+        return self.name + ", " + str(self.weight)
 
 def buildCows(dict):
     cow_list = []
     for i, j in dict.items():
-        cow_list.append(Cows(n = i, w = j))
+        cow_list.append(Cattle(n = i, w = j))
     return cow_list
 
+cow_set = buildCows(cows)
 
 # Problem 1
+"""
+Uses a greedy heuristic to determine an allocation of cows that attempts to
+minimize the number of spaceship trips needed to transport all the cows. The
+returned allocation of cows may or may not be optimal.
+The greedy heuristic should follow the following method:
+
+1. As long as the current trip can fit another cow, add the largest cow that will fit
+    to the trip
+2. Once the trip is full, begin a new trip to transport the remaining cows
+
+Does not mutate the given dictionary of cows.
+
+Parameters:
+cows - a dictionary of name (string), weight (int) pairs
+limit - weight limit of the spaceship (an int)
+
+Returns:
+A list of lists, with each inner list containing the names of cows
+transported on a particular trip and the overall list containing all the
+trips
+"""
 def greedy_cow_transport(cows,limit=10):
-    """
-    Uses a greedy heuristic to determine an allocation of cows that attempts to
-    minimize the number of spaceship trips needed to transport all the cows. The
-    returned allocation of cows may or may not be optimal.
-    The greedy heuristic should follow the following method:
-
-    1. As long as the current trip can fit another cow, add the largest cow that will fit
-        to the trip
-    2. Once the trip is full, begin a new trip to transport the remaining cows
-
-    Does not mutate the given dictionary of cows.
-
-    Parameters:
-    cows - a dictionary of name (string), weight (int) pairs
-    limit - weight limit of the spaceship (an int)
-
-    Returns:
-    A list of lists, with each inner list containing the names of cows
-    transported on a particular trip and the overall list containing all the
-    trips
-    """
     # TODO: Your code here
-    cow_set = buildCows(cows)
-    items_sort = sorted(cow_set, reverse = False, key = Cows.getWeight)
+
+    """
+    ---- First Try Code ----
+        items_sort = sorted(cow_set, reverse = True, key = Cattle.getWeight)
+        result = []
+        total_weight = 0
+        for i in range(len(items_sort)):
+            if (total_weight + items_sort[i].getWeight()) <= limit:
+                result.append(items_sort[i].getName())
+                total_weight += items_sort[i].getWeight()
+        return (result, total_weight)
+    """
+
+    items_sort = sorted(cow_set, reverse = True, key = Cattle.getWeight)
     result = []
-    total_weight = 0
-    for i in range(len(items_sort)):
-        if (total_weight + items_sort[i].getWeight()) <= limit:
-            result.append(items_sort[i].getName())
-            total_weight += items_sort[i].getWeight()
-    return (result, total_weight)
+    while items_sort != []:
+        trip_list = []
+        trip_weight = 0
+        for i in range(len(items_sort)):
+            if (trip_weight + items_sort[i].getWeight()) <= limit:
+                trip_list.append(items_sort[i].getName())
+                trip_weight += items_sort[i].getWeight()
+                items_sort.remove(items_sort[i])
+            result.append((trip_list, trip_weight))
+    return result
     pass
-    """
-    This manipulates the original dictionary, converting it into a class of cows. I can't figure out how to run through iterations of a dictionary
-    """
+
+"""
+This manipulates the original dictionary, converting it into a class of cows. I can't figure out how to run through iterations of a dictionary
+"""
+
+
+"""
+---- Me trying different ways to search through a dictionary, but without finding a solution ----
+def greedy_cow_transport2(cows, limit = 10):
+    cow_dict = sorted(cows.items(), key = lambda x: x[1], reverse = True)
+    result = []
+    while cow_dict != {}:
+        trip_weight = 0
+        trip_list = []
+        for i in cow_dict:
+            if ((trip_weight + cow_dict[i].values()) <= limit):
+                trip_weight += cow_dict[i].values()
+                trip_list.append(cow_dict[i].keys())
+                cow_dict.pop(cow_dict[i].key())
+        result.append((trip_list, trip_weight))
+    return result
+
+def greedy_cow_transport3(cows, limit = 10):
+    result = []
+    while cow_dict != {}:
+        trip_weight = 0
+        trip_list = []
+        while ()
+"""
 
 
 # Problem 2
